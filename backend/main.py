@@ -76,3 +76,30 @@ Give a helpful, specific answer based on their CV."""
 
     response = model.generate_content(prompt)
     return {"response": response.text}
+
+
+class JobDescription(BaseModel):
+    job_description: str
+
+@app.post("/fit-score")
+async def fit_score(job: JobDescription):
+    if not cv_text:
+        return {"error": "Please upload your CV first."}
+    
+    prompt = f"""You are CareerPilot, an AI career assistant.
+Compare this user's CV against the job description and give a fit score.
+
+CV:
+{cv_text}
+
+Job Description:
+{job.job_description}
+
+Respond in this exact format:
+SCORE: [number between 0-100]
+SUMMARY: [2-3 sentences explaining the match]
+STRENGTHS: [bullet points of matching skills]
+GAPS: [bullet points of missing skills]"""
+
+    response = model.generate_content(prompt)
+    return {"result": response.text}
